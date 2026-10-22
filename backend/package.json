@@ -1,0 +1,14 @@
+{
+  "name": "hisabkhata-backend",
+  "version": "1.0.0",
+  "description": "Backend API service scaffold for HisabKhata business bookkeeping",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "dotenv": "^17.2.3"
+  }
+}

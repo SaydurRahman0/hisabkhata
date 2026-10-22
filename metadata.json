@@ -1,0 +1,7 @@
+{
+  "name": "HisabKhata - Business Bookkeeping",
+  "description": "Secure, bilingual business bookkeeping dashboard for small businesses in Bangladesh to track sales, cash collections, inventory, and credit dues.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
