@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { bn } from '../locales/bn.js';
 import { en } from '../locales/en.js';
+import { apiLogin, apiRegister, apiLogout, apiGetMe } from '../lib/api.js';
 
 const AppContext = createContext(null);
 
@@ -16,7 +17,7 @@ export function AppProvider({ children }) {
         return savedLang;
       }
     } catch {
-      // localStorage may fail in private mode
+      // fallback
     }
     return 'bn';
   });
@@ -46,6 +47,37 @@ export function AppProvider({ children }) {
     message: '',
     actionBadge: ''
   });
+
+  // 4. Authentication State
+  const [user, setUser] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Restore current session on initial page load
+  useEffect(() => {
+    let mounted = true;
+
+    async function checkCurrentSession() {
+      try {
+        const currentUser = await apiGetMe();
+        if (mounted && currentUser) {
+          setUser(currentUser);
+        }
+      } catch (err) {
+        // Backend not ready or unauthenticated; remains guest
+      } finally {
+        if (mounted) {
+          setIsAuthLoading(false);
+        }
+      }
+    }
+
+    checkCurrentSession();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Sync theme with DOM and localStorage
   useEffect(() => {
@@ -138,6 +170,36 @@ export function AppProvider({ children }) {
     setIsMobileNavOpen(false);
   }, []);
 
+  // Auth Modal helpers
+  const openAuthModal = useCallback(() => {
+    setIsAuthModalOpen(true);
+  }, []);
+
+  const closeAuthModal = useCallback(() => {
+    setIsAuthModalOpen(false);
+  }, []);
+
+  // Auth Actions
+  const handleLogin = useCallback(async (email, password) => {
+    const data = await apiLogin(email, password);
+    setUser(data.user);
+    return data;
+  }, []);
+
+  const handleRegister = useCallback(async (fullName, email, password) => {
+    const data = await apiRegister(fullName, email, password);
+    setUser(data.user);
+    return data;
+  }, []);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await apiLogout();
+    } finally {
+      setUser(null);
+    }
+  }, []);
+
   const value = {
     language,
     setLanguage,
@@ -152,7 +214,17 @@ export function AppProvider({ children }) {
     closeMobileNav,
     modalState,
     openPreviewModal,
-    closeModal
+    closeModal,
+    // Auth context
+    user,
+    isAuthenticated: Boolean(user),
+    isAuthLoading,
+    isAuthModalOpen,
+    openAuthModal,
+    closeAuthModal,
+    handleLogin,
+    handleRegister,
+    handleLogout
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

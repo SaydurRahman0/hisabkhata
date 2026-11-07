@@ -31,24 +31,21 @@ export function Sidebar() {
       label: t('nav.products'),
       icon: Package,
       isActive: activeNav === 'products',
-      isAvailable: false,
-      phase: '02'
+      isAvailable: true
     },
     {
       id: 'sales',
       label: t('nav.sales'),
       icon: Receipt,
       isActive: activeNav === 'sales',
-      isAvailable: false,
-      phase: '02'
+      isAvailable: true
     },
     {
       id: 'customers',
       label: t('nav.customers'),
       icon: Users,
       isActive: activeNav === 'customers',
-      isAvailable: false,
-      phase: '02'
+      isAvailable: true
     },
     {
       id: 'dueManagement',
@@ -159,7 +156,7 @@ export function Sidebar() {
           </div>
           <div className="mt-2.5 pt-2 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400">
             <span>{language === 'bn' ? 'বর্তমান স্ট্যাটাস:' : 'Current Status:'}</span>
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400">Phase 01 UI</span>
+            <span className="font-semibold text-indigo-600 dark:text-indigo-400">Phase 04A Products</span>
           </div>
         </div>
       </div>

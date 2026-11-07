@@ -8,7 +8,7 @@ import { Card } from '../../components/ui/Card.jsx';
  * Provides accessible shortcuts with full interaction feedback and Phase 02 roadmap awareness.
  */
 export function QuickActions() {
-  const { language, t, openPreviewModal } = useApp();
+  const { language, t, openPreviewModal, setActiveNav } = useApp();
 
   const actions = [
     {
@@ -20,8 +20,8 @@ export function QuickActions() {
       bgHover: 'hover:border-indigo-300 dark:hover:border-indigo-800',
       details:
         language === 'bn'
-          ? 'নতুন বিক্রয় ফর্ম (নগদ ও বাকিতে বিক্রয়, বারকোড স্ক্যানার, এবং তাত্ক্ষণিক দেনা হিসাব) ফেজ ০২-এ যুক্ত করা হবে।'
-          : 'New sales voucher entry (cash, credit, item lines, and instant customer ledger updates) will be introduced in Phase 02.'
+          ? 'নতুন বিক্রয় ফর্ম (নগদ ও বাকিতে বিক্রয়, বারকোড স্ক্যানার, এবং তাত্ক্ষণিক দেনা হিসাব) পরবর্তী ধাপে যুক্ত করা হবে।'
+          : 'New sales voucher entry (cash, credit, item lines, and instant customer ledger updates) will be introduced in the next phase.'
     },
     {
       id: 'collect-due',
@@ -44,8 +44,8 @@ export function QuickActions() {
       bgHover: 'hover:border-sky-300 dark:hover:border-sky-800',
       details:
         language === 'bn'
-          ? 'নতুন ক্রেতা খাতা (গ্রাহকের নাম, মোবাইল নম্বর, এনআইডি/দোকানের ঠিকানা, এবং প্রাথমিক বাকি খতিয়ান) ফেজ ০২-এ যুক্ত হবে।'
-          : 'Customer profile registration (name, phone, address, credit limit, and opening balance) will be introduced in Phase 02.'
+          ? 'নতুন ক্রেতা খাতা ও গ্রাহক ব্যবস্থাপনা।'
+          : 'Customer directory and profile management.'
     },
     {
       id: 'add-product',
@@ -56,8 +56,8 @@ export function QuickActions() {
       bgHover: 'hover:border-amber-300 dark:hover:border-amber-800',
       details:
         language === 'bn'
-          ? 'পণ্য ক্যাটালগ (ক্রয়মূল্য, খুচরা বিক্রয়মূল্য, সর্বনিম্ন স্টক সতর্কতা, এবং একক) ফেজ ০২-এ কার্যকর হবে।'
-          : 'Product inventory management (buying price, selling price, minimum stock thresholds, and units) will be introduced in Phase 02.'
+          ? 'পণ্য ক্যাটালগ ও স্টক ব্যবস্থাপনা।'
+          : 'Product catalogue and stock management.'
     }
   ];
 
@@ -79,7 +79,17 @@ export function QuickActions() {
             <button
               key={act.id}
               type="button"
-              onClick={() => openPreviewModal(act.label, act.details, 'Phase 02')}
+              onClick={() => {
+                if (act.id === 'new-sale') {
+                  setActiveNav('sales');
+                } else if (act.id === 'add-product') {
+                  setActiveNav('products');
+                } else if (act.id === 'add-customer') {
+                  setActiveNav('customers');
+                } else {
+                  openPreviewModal(act.label, act.details, 'Phase 05');
+                }
+              }}
               className={`flex items-start gap-3 p-3 text-left rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 transition-all cursor-pointer ${act.bgHover} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
             >
               <div className={`p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 ${act.accent} shrink-0`}>

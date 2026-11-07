@@ -14,6 +14,41 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- Browser extension fetch setter guard: prevents TypeError when extensions attempt to monkey-patch window.fetch -->
+    <script>
+      (function() {
+        try {
+          var _rawFetch = window.fetch;
+          var _currentFetch = function() {
+            return _rawFetch.apply(window, arguments);
+          };
+
+          // Guard on Window.prototype if accessible
+          if (typeof Window !== 'undefined' && Window.prototype) {
+            try {
+              var protoDesc = Object.getOwnPropertyDescriptor(Window.prototype, 'fetch');
+              if (!protoDesc || !protoDesc.set) {
+                Object.defineProperty(Window.prototype, 'fetch', {
+                  get: function() { return _currentFetch; },
+                  set: function(fn) { _currentFetch = fn; },
+                  configurable: true,
+                  enumerable: true
+                });
+              }
+            } catch (e) {}
+          }
+
+          // Guard directly on window object
+          Object.defineProperty(window, 'fetch', {
+            get: function() { return _currentFetch; },
+            set: function(fn) { _currentFetch = fn; },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (err) {}
+      })();
+    </script>
   </head>
   <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
     <div id="root"></div>

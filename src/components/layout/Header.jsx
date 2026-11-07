@@ -10,9 +10,11 @@ import {
   User,
   ShieldCheck,
   Building2,
-  ExternalLink
+  LogIn,
+  LogOut
 } from 'lucide-react';
 import { Dropdown } from '../ui/Dropdown.jsx';
+import { Button } from '../ui/Button.jsx';
 
 /**
  * Top Header component.
@@ -26,8 +28,14 @@ export function Header() {
     toggleTheme,
     t,
     toggleMobileNav,
-    openPreviewModal
+    openPreviewModal,
+    user,
+    isAuthenticated,
+    openAuthModal,
+    handleLogout
   } = useApp();
+
+  const userInitial = user && user.fullName ? user.fullName.charAt(0).toUpperCase() : 'র';
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between gap-4 px-4 sm:px-6 py-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800 transition-colors">
@@ -77,7 +85,7 @@ export function Header() {
         </span>
       </div>
 
-      {/* Zone 3: Controls (Language Switch, Theme Toggle, Profile Menu) */}
+      {/* Zone 3: Controls (Language Switch, Theme Toggle, Auth / Profile Menu) */}
       <div className="flex items-center gap-2 shrink-0">
         {/* Language Switch Button */}
         <button
@@ -106,79 +114,96 @@ export function Header() {
           )}
         </button>
 
-        {/* Store Profile Dropdown Placeholder (No fake authentication) */}
-        <Dropdown
-          align="right"
-          trigger={
-            <button
-              type="button"
-              className="flex items-center gap-2 p-1.5 sm:px-2.5 sm:py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-              aria-label="Store Profile Menu"
-            >
-              <div className="w-6 h-6 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-xs shrink-0">
-                র
-              </div>
-              <div className="hidden sm:flex flex-col text-left leading-tight">
-                <span className="font-semibold text-slate-900 dark:text-slate-100 max-w-[120px] truncate">
-                  {t('header.storeOwner')}
-                </span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                  {t('header.ownerRole')}
-                </span>
-              </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-0.5" aria-hidden="true" />
-            </button>
-          }
-        >
-          <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
-            <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
-              {t('header.currentStore')}
-            </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              {t('header.storeLocation')}
-            </p>
-          </div>
-
-          <div className="py-1">
-            <button
-              type="button"
-              onClick={() =>
-                openPreviewModal(
-                  t('header.profile'),
-                  language === 'bn'
-                    ? 'দোকানের ঠিকানা, ট্রেড লাইসেন্স নম্বর, এবং ভ্যাট নিবন্ধন সংক্রান্ত সেটিংস ফেজ ০২-এ যুক্ত করা হবে।'
-                    : 'Store profile, trade license number, and billing parameters will be configured in Phase 02.'
-                )
-              }
-              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-left"
-            >
-              <Building2 className="w-3.5 h-3.5 text-slate-400" />
-              <span>{t('header.profile')}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                openPreviewModal(
-                  language === 'bn' ? 'নিরাপত্তা তথ্য' : 'Security Details',
-                  language === 'bn'
-                    ? 'হিসাবখাতা সিস্টেমটি মাল্টি-ইউজার রোল এবং নিরাপদ সেশন ভিত্তিক ডাটাবেজ সুরক্ষায় ডিজাইন করা হচ্ছে।'
-                    : 'HisabKhata is architected for secure multi-user role-based access in future phases.'
-                )
-              }
-              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-left"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-              <span>{language === 'bn' ? 'নিরাপত্তা ও ডাটাবেজ স্ট্যাটাস' : 'Security & Database Status'}</span>
-            </button>
-          </div>
-
-          <div className="border-t border-slate-100 dark:border-slate-800 pt-1">
-            <div className="px-3 py-1.5 text-[11px] text-slate-400 dark:text-slate-500 italic">
-              {t('header.logoutPlaceholder')}
+        {/* Authentication or Profile Dropdown */}
+        {isAuthenticated ? (
+          <Dropdown
+            align="right"
+            trigger={
+              <button
+                type="button"
+                className="flex items-center gap-2 p-1.5 sm:px-2.5 sm:py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                aria-label="User Profile Menu"
+              >
+                <div className="w-6 h-6 rounded bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                  {userInitial}
+                </div>
+                <div className="hidden sm:flex flex-col text-left leading-tight">
+                  <span className="font-semibold text-slate-900 dark:text-slate-100 max-w-[120px] truncate">
+                    {user.fullName}
+                  </span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                    {t('header.ownerRole')}
+                  </span>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-0.5" aria-hidden="true" />
+              </button>
+            }
+          >
+            <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+              <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate">
+                {user.fullName}
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-mono">
+                {user.email}
+              </p>
             </div>
-          </div>
-        </Dropdown>
+
+            <div className="py-1">
+              <button
+                type="button"
+                onClick={() =>
+                  openPreviewModal(
+                    t('header.profile'),
+                    language === 'bn'
+                      ? 'দোকানের ঠিকানা, ট্রেড লাইসেন্স নম্বর, এবং ভ্যাট নিবন্ধন সংক্রান্ত প্রোফাইল সেটিংস পরবর্তীতে যুক্ত হবে।'
+                      : 'Store profile, trade license number, and billing parameters will be configured in subsequent phases.'
+                  )
+                }
+                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-left"
+              >
+                <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                <span>{t('header.profile')}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  openPreviewModal(
+                    language === 'bn' ? 'নিরাপত্তা তথ্য' : 'Security Details',
+                    language === 'bn'
+                      ? `অ্যাকাউন্ট আইডি: ${user.id}\nভূমিকা: ${user.role}\n\nআপনার সেশনটি সুরক্ষিত HTTP-only কুকি এবং CSRF সুরক্ষার মাধ্যমে এনক্রিপ্ট করা আছে।`
+                      : `Account ID: ${user.id}\nRole: ${user.role}\n\nYour session is encrypted and protected via HTTP-only cookies and CSRF tokens.`
+                  )
+                }
+                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-left"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+                <span>{language === 'bn' ? 'সেশন ও নিরাপত্তা' : 'Session & Security'}</span>
+              </button>
+            </div>
+
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-1">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-left font-medium"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>{t('header.logoutBtn')}</span>
+              </button>
+            </div>
+          </Dropdown>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={openAuthModal}
+            icon={LogIn}
+            className="text-xs"
+          >
+            {t('header.loginBtn')}
+          </Button>
+        )}
       </div>
     </header>
   );

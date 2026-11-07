@@ -4,12 +4,24 @@ import { Sidebar } from './components/layout/Sidebar.jsx';
 import { Header } from './components/layout/Header.jsx';
 import { MobileNav } from './components/layout/MobileNav.jsx';
 import { DashboardOverview } from './features/dashboard/DashboardOverview.jsx';
+import { ProductsView } from './features/products/ProductsView.jsx';
+import { CustomersView } from './features/customers/CustomersView.jsx';
+import { SalesView } from './features/sales/SalesView.jsx';
+import { AuthModal } from './features/auth/AuthModal.jsx';
 import { Modal } from './components/ui/Modal.jsx';
 import { Button } from './components/ui/Button.jsx';
 import { ShieldCheck } from 'lucide-react';
 
 function MainLayout() {
-  const { language, t, modalState, closeModal } = useApp();
+  const {
+    language,
+    t,
+    activeNav,
+    modalState,
+    closeModal,
+    isAuthModalOpen,
+    closeAuthModal
+  } = useApp();
 
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
@@ -24,7 +36,15 @@ function MainLayout() {
         <Header />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <DashboardOverview />
+          {activeNav === 'products' ? (
+            <ProductsView />
+          ) : activeNav === 'customers' ? (
+            <CustomersView />
+          ) : activeNav === 'sales' ? (
+            <SalesView />
+          ) : (
+            <DashboardOverview />
+          )}
         </main>
 
         {/* Quiet Footer */}
@@ -33,7 +53,7 @@ function MainLayout() {
             <p>{t('footer.rights')}</p>
             <div className="flex items-center gap-3">
               <span className="font-mono text-[11px] text-indigo-600 dark:text-indigo-400">
-                {t('footer.phase')}
+                Phase 05: Sales & Transactions
               </span>
               <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
               <span>Bangladesh</span>
@@ -57,7 +77,7 @@ function MainLayout() {
           <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
             <ShieldCheck className="w-4 h-4" />
             <span>
-              {modalState.actionBadge || (language === 'bn' ? 'ফেজ ০১ সিস্টেম' : 'Phase 01 System')}
+              {modalState.actionBadge || (language === 'bn' ? 'ফেজ ০৪এ সিস্টেম' : 'Phase 04A System')}
             </span>
           </div>
           <p className="whitespace-pre-line leading-relaxed text-slate-600 dark:text-slate-300">
@@ -65,6 +85,9 @@ function MainLayout() {
           </p>
         </div>
       </Modal>
+
+      {/* Authentication Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
     </div>
   );
 }

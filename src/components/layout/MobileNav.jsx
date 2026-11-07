@@ -37,24 +37,21 @@ export function MobileNav() {
       label: t('nav.products'),
       icon: Package,
       isActive: activeNav === 'products',
-      isAvailable: false,
-      phase: '02'
+      isAvailable: true
     },
     {
       id: 'sales',
       label: t('nav.sales'),
       icon: Receipt,
       isActive: activeNav === 'sales',
-      isAvailable: false,
-      phase: '02'
+      isAvailable: true
     },
     {
       id: 'customers',
       label: t('nav.customers'),
       icon: Users,
       isActive: activeNav === 'customers',
-      isAvailable: false,
-      phase: '02'
+      isAvailable: true
     },
     {
       id: 'dueManagement',
